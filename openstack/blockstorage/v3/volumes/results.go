@@ -84,6 +84,14 @@ type Volume struct {
 	VolumeImageMetadata map[string]string `json:"volume_image_metadata"`
 }
 
+// VolumeBrief contains only essential information associated with an OpenStack Volume.
+type VolumeBrief struct {
+	// Unique identifier for the volume.
+	ID string `json:"id"`
+	// Human-readable display name for the volume.
+	Name string `json:"name"`
+}
+
 // UnmarshalJSON another unmarshalling function
 func (r *Volume) UnmarshalJSON(b []byte) error {
 	type tmp Volume
@@ -102,6 +110,11 @@ func (r *Volume) UnmarshalJSON(b []byte) error {
 	r.UpdatedAt = time.Time(s.UpdatedAt)
 
 	return err
+}
+
+// VolumeBriefPage is a pagination.pager that is returned from a call to the ListDetail function.
+type VolumeBriefPage struct {
+	pagination.LinkedPageBase
 }
 
 // VolumePage is a pagination.pager that is returned from a call to the List function.
@@ -130,10 +143,38 @@ func (page VolumePage) NextPageURL() (string, error) {
 	return gophercloud.ExtractNextURL(s.Links)
 }
 
-// ExtractVolumes extracts and returns Volumes. It is used while iterating over a volumes.List call.
+// IsEmpty returns true if a ListResult contains no Volumes.
+func (r VolumeBriefPage) IsEmpty() (bool, error) {
+	if r.StatusCode == 204 {
+		return true, nil
+	}
+
+	volumes, err := ExtractVolumesBrief(r)
+	return len(volumes) == 0, err
+}
+
+func (page VolumeBriefPage) NextPageURL() (string, error) {
+	var s struct {
+		Links []gophercloud.Link `json:"volumes_links"`
+	}
+	err := page.ExtractInto(&s)
+	if err != nil {
+		return "", err
+	}
+	return gophercloud.ExtractNextURL(s.Links)
+}
+
+// ExtractVolumes extracts and returns Volumes. It is used while iterating over a volumes.ListDetails call.
 func ExtractVolumes(r pagination.Page) ([]Volume, error) {
 	var s []Volume
 	err := ExtractVolumesInto(r, &s)
+	return s, err
+}
+
+// ExtractVolumesBrief extracts and returns VolumeBrief. It is used while iterating over a volumes.List call.
+func ExtractVolumesBrief(r pagination.Page) ([]VolumeBrief, error) {
+	var s []VolumeBrief
+	err := ExtractVolumesBriefInto(r, &s)
 	return s, err
 }
 
@@ -156,6 +197,11 @@ func (r commonResult) ExtractInto(v interface{}) error {
 // ExtractVolumesInto similar to ExtractInto but operates on a `list` of volumes
 func ExtractVolumesInto(r pagination.Page, v interface{}) error {
 	return r.(VolumePage).Result.ExtractIntoSlicePtr(v, "volumes")
+}
+
+// ExtractVolumesBriefInto similar to ExtractInto but operates on a `list` of volumes
+func ExtractVolumesBriefInto(r pagination.Page, v interface{}) error {
+	return r.(VolumeBriefPage).Result.ExtractIntoSlicePtr(v, "volumes")
 }
 
 // CreateResult contains the response body and error from a Create request.
