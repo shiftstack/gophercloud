@@ -7,6 +7,10 @@ func createURL(c *gophercloud.ServiceClient) string {
 }
 
 func listURL(c *gophercloud.ServiceClient) string {
+	return c.ServiceURL("volumes")
+}
+
+func listDetailURL(c *gophercloud.ServiceClient) string {
 	return c.ServiceURL("volumes", "detail")
 }
 

@@ -32,8 +32,8 @@ func TestVolumes(t *testing.T) {
 	defer DeleteVolume(t, client, volume2)
 
 	// Update volume
-	updatedVolumeName := ""
-	updatedVolumeDescription := ""
+	updatedVolumeName := "updated-name"
+	updatedVolumeDescription := "updated-description"
 	updateOpts := volumes.UpdateOpts{
 		Name:        &updatedVolumeName,
 		Description: &updatedVolumeDescription,
@@ -45,12 +45,35 @@ func TestVolumes(t *testing.T) {
 	th.AssertEquals(t, updatedVolume.Name, updatedVolumeName)
 	th.AssertEquals(t, updatedVolume.Description, updatedVolumeDescription)
 
-	listOpts := volumes.ListOpts{
-		Limit: 1,
-	}
+	listOpts := volumes.ListOpts{}
 
 	err = volumes.List(client, listOpts).EachPage(context.TODO(), func(_ context.Context, page pagination.Page) (bool, error) {
 		actual, err := volumes.ExtractVolumes(page)
+		th.AssertNoErr(t, err)
+		th.AssertEquals(t, 2, len(actual))
+
+		var found1, found2 bool
+		for _, v := range actual {
+			if v.ID == volume1.ID {
+				found1 = true
+			}
+			if v.ID == volume2.ID {
+				found2 = true
+			}
+		}
+
+		th.AssertEquals(t, found1, true)
+		th.AssertEquals(t, found2, true)
+
+		return true, nil
+	})
+
+	listOpts = volumes.ListOpts{
+		Limit: 1,
+	}
+
+	err = volumes.ListDetail(client, listOpts).EachPage(context.TODO(), func(_ context.Context, page pagination.Page) (bool, error) {
+		actual, err := volumes.ExtractVolumesDetail(page)
 		th.AssertNoErr(t, err)
 		th.AssertEquals(t, 1, len(actual))
 
@@ -62,6 +85,7 @@ func TestVolumes(t *testing.T) {
 		}
 
 		th.AssertEquals(t, found, true)
+		th.AssertIntGreaterOrEqual(t, len(actual[0].Description), 1)
 
 		return true, nil
 	})

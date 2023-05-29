@@ -282,6 +282,22 @@ func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pa
 	}
 
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return VolumeBriefPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// List returns Volumes optionally limited by the conditions provided in ListOpts.
+func ListDetail(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := listDetailURL(client)
+	if opts != nil {
+		query, err := opts.ToVolumeListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
 		return VolumePage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
