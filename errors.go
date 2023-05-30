@@ -99,6 +99,14 @@ func (e ErrUnexpectedResponseCode) GetStatusCode() int {
 	return e.Actual
 }
 
+func (e ErrUnexpectedResponseCode) GetBody() []byte {
+	return e.Body
+}
+
+func (e ErrUnexpectedResponseCode) Unwrap() error {
+	return e
+}
+
 // StatusCodeError is a convenience interface to easily allow access to the
 // status code field of the various ErrDefault* types.
 //
@@ -109,6 +117,8 @@ func (e ErrUnexpectedResponseCode) GetStatusCode() int {
 type StatusCodeError interface {
 	Error() string
 	GetStatusCode() int
+	GetBody() []byte
+	Unwrap() error
 }
 
 // ErrDefault400 is the default error type returned on a 400 HTTP response code.
