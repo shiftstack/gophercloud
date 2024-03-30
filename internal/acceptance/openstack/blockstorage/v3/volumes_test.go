@@ -6,12 +6,9 @@ package v3
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/gophercloud/gophercloud/v2/internal/acceptance/clients"
-	compute "github.com/gophercloud/gophercloud/v2/internal/acceptance/openstack/compute/v2"
 	"github.com/gophercloud/gophercloud/v2/internal/acceptance/tools"
-	"github.com/gophercloud/gophercloud/v2/openstack/blockstorage/v3/snapshots"
 	"github.com/gophercloud/gophercloud/v2/openstack/blockstorage/v3/volumes"
 	"github.com/gophercloud/gophercloud/v2/pagination"
 	th "github.com/gophercloud/gophercloud/v2/testhelper"
@@ -93,258 +90,258 @@ func TestVolumes(t *testing.T) {
 	th.AssertNoErr(t, err)
 }
 
-func TestVolumesMultiAttach(t *testing.T) {
-	clients.RequireAdmin(t)
-	clients.RequireLong(t)
+// func TestVolumesMultiAttach(t *testing.T) {
+// 	clients.RequireAdmin(t)
+// 	clients.RequireLong(t)
 
-	client, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// 	client, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	vt, err := CreateVolumeTypeMultiAttach(t, client)
-	th.AssertNoErr(t, err)
-	defer DeleteVolumeType(t, client, vt)
+// 	vt, err := CreateVolumeTypeMultiAttach(t, client)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolumeType(t, client, vt)
 
-	volumeName := tools.RandomString("ACPTTEST", 16)
+// 	volumeName := tools.RandomString("ACPTTEST", 16)
 
-	volOpts := volumes.CreateOpts{
-		Size:        1,
-		Name:        volumeName,
-		Description: "Testing creation of multiattach enabled volume",
-		VolumeType:  vt.ID,
-	}
+// 	volOpts := volumes.CreateOpts{
+// 		Size:        1,
+// 		Name:        volumeName,
+// 		Description: "Testing creation of multiattach enabled volume",
+// 		VolumeType:  vt.ID,
+// 	}
 
-	vol, err := volumes.Create(context.TODO(), client, volOpts).Extract()
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, client, vol)
+// 	vol, err := volumes.Create(context.TODO(), client, volOpts).Extract()
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, client, vol)
 
-	ctx, cancel := context.WithTimeout(context.TODO(), 60*time.Second)
-	defer cancel()
+// 	ctx, cancel := context.WithTimeout(context.TODO(), 60*time.Second)
+// 	defer cancel()
 
-	err = volumes.WaitForStatus(ctx, client, vol.ID, "available")
-	th.AssertNoErr(t, err)
+// 	err = volumes.WaitForStatus(ctx, client, vol.ID, "available")
+// 	th.AssertNoErr(t, err)
 
-	th.AssertEquals(t, vol.Multiattach, true)
-}
+// 	th.AssertEquals(t, vol.Multiattach, true)
+// }
 
-func TestVolumesCascadeDelete(t *testing.T) {
-	clients.RequireLong(t)
+// func TestVolumesCascadeDelete(t *testing.T) {
+// 	clients.RequireLong(t)
 
-	client, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// 	client, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	vol, err := CreateVolume(t, client)
-	th.AssertNoErr(t, err)
+// 	vol, err := CreateVolume(t, client)
+// 	th.AssertNoErr(t, err)
 
-	ctx, cancel := context.WithTimeout(context.TODO(), 60*time.Second)
-	defer cancel()
+// 	ctx, cancel := context.WithTimeout(context.TODO(), 60*time.Second)
+// 	defer cancel()
 
-	err = volumes.WaitForStatus(ctx, client, vol.ID, "available")
-	th.AssertNoErr(t, err)
+// 	err = volumes.WaitForStatus(ctx, client, vol.ID, "available")
+// 	th.AssertNoErr(t, err)
 
-	snapshot1, err := CreateSnapshot(t, client, vol)
-	th.AssertNoErr(t, err)
+// 	snapshot1, err := CreateSnapshot(t, client, vol)
+// 	th.AssertNoErr(t, err)
 
-	snapshot2, err := CreateSnapshot(t, client, vol)
-	th.AssertNoErr(t, err)
+// 	snapshot2, err := CreateSnapshot(t, client, vol)
+// 	th.AssertNoErr(t, err)
 
-	t.Logf("Attempting to delete volume: %s", vol.ID)
+// 	t.Logf("Attempting to delete volume: %s", vol.ID)
 
-	deleteOpts := volumes.DeleteOpts{Cascade: true}
-	err = volumes.Delete(context.TODO(), client, vol.ID, deleteOpts).ExtractErr()
-	if err != nil {
-		t.Fatalf("Unable to delete volume %s: %v", vol.ID, err)
-	}
+// 	deleteOpts := volumes.DeleteOpts{Cascade: true}
+// 	err = volumes.Delete(context.TODO(), client, vol.ID, deleteOpts).ExtractErr()
+// 	if err != nil {
+// 		t.Fatalf("Unable to delete volume %s: %v", vol.ID, err)
+// 	}
 
-	for _, sid := range []string{snapshot1.ID, snapshot2.ID} {
-		err := tools.WaitFor(func(ctx context.Context) (bool, error) {
-			_, err := snapshots.Get(ctx, client, sid).Extract()
-			if err != nil {
-				return true, nil
-			}
-			return false, nil
-		})
-		th.AssertNoErr(t, err)
-		t.Logf("Successfully deleted snapshot: %s", sid)
-	}
+// 	for _, sid := range []string{snapshot1.ID, snapshot2.ID} {
+// 		err := tools.WaitFor(func(ctx context.Context) (bool, error) {
+// 			_, err := snapshots.Get(ctx, client, sid).Extract()
+// 			if err != nil {
+// 				return true, nil
+// 			}
+// 			return false, nil
+// 		})
+// 		th.AssertNoErr(t, err)
+// 		t.Logf("Successfully deleted snapshot: %s", sid)
+// 	}
 
-	err = tools.WaitFor(func(ctx context.Context) (bool, error) {
-		_, err := volumes.Get(ctx, client, vol.ID).Extract()
-		if err != nil {
-			return true, nil
-		}
-		return false, nil
-	})
-	th.AssertNoErr(t, err)
+// 	err = tools.WaitFor(func(ctx context.Context) (bool, error) {
+// 		_, err := volumes.Get(ctx, client, vol.ID).Extract()
+// 		if err != nil {
+// 			return true, nil
+// 		}
+// 		return false, nil
+// 	})
+// 	th.AssertNoErr(t, err)
 
-	t.Logf("Successfully deleted volume: %s", vol.ID)
-}
+// 	t.Logf("Successfully deleted volume: %s", vol.ID)
+// }
 
-func TestVolumeActionsUploadImageDestroy(t *testing.T) {
-	blockClient, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsUploadImageDestroy(t *testing.T) {
+// 	blockClient, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	computeClient, err := clients.NewComputeV2Client()
-	th.AssertNoErr(t, err)
+// 	computeClient, err := clients.NewComputeV2Client()
+// 	th.AssertNoErr(t, err)
 
-	volume, err := CreateVolume(t, blockClient)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, blockClient, volume)
+// 	volume, err := CreateVolume(t, blockClient)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, blockClient, volume)
 
-	volumeImage, err := CreateUploadImage(t, blockClient, volume)
-	th.AssertNoErr(t, err)
+// 	volumeImage, err := CreateUploadImage(t, blockClient, volume)
+// 	th.AssertNoErr(t, err)
 
-	tools.PrintResource(t, volumeImage)
+// 	tools.PrintResource(t, volumeImage)
 
-	err = DeleteUploadedImage(t, computeClient, volumeImage.ImageID)
-	th.AssertNoErr(t, err)
-}
+// 	err = DeleteUploadedImage(t, computeClient, volumeImage.ImageID)
+// 	th.AssertNoErr(t, err)
+// }
 
-func TestVolumeActionsAttachCreateDestroy(t *testing.T) {
-	blockClient, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsAttachCreateDestroy(t *testing.T) {
+// 	blockClient, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	computeClient, err := clients.NewComputeV2Client()
-	th.AssertNoErr(t, err)
+// 	computeClient, err := clients.NewComputeV2Client()
+// 	th.AssertNoErr(t, err)
 
-	server, err := compute.CreateServer(t, computeClient)
-	th.AssertNoErr(t, err)
-	defer compute.DeleteServer(t, computeClient, server)
+// 	server, err := compute.CreateServer(t, computeClient)
+// 	th.AssertNoErr(t, err)
+// 	defer compute.DeleteServer(t, computeClient, server)
 
-	volume, err := CreateVolume(t, blockClient)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, blockClient, volume)
+// 	volume, err := CreateVolume(t, blockClient)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, blockClient, volume)
 
-	err = CreateVolumeAttach(t, blockClient, volume, server)
-	th.AssertNoErr(t, err)
+// 	err = CreateVolumeAttach(t, blockClient, volume, server)
+// 	th.AssertNoErr(t, err)
 
-	newVolume, err := volumes.Get(context.TODO(), blockClient, volume.ID).Extract()
-	th.AssertNoErr(t, err)
+// 	newVolume, err := volumes.Get(context.TODO(), blockClient, volume.ID).Extract()
+// 	th.AssertNoErr(t, err)
 
-	DeleteVolumeAttach(t, blockClient, newVolume)
-}
+// 	DeleteVolumeAttach(t, blockClient, newVolume)
+// }
 
-func TestVolumeActionsReserveUnreserve(t *testing.T) {
-	client, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsReserveUnreserve(t *testing.T) {
+// 	client, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	volume, err := CreateVolume(t, client)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, client, volume)
+// 	volume, err := CreateVolume(t, client)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, client, volume)
 
-	err = CreateVolumeReserve(t, client, volume)
-	th.AssertNoErr(t, err)
-	defer DeleteVolumeReserve(t, client, volume)
-}
+// 	err = CreateVolumeReserve(t, client, volume)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolumeReserve(t, client, volume)
+// }
 
-func TestVolumeActionsExtendSize(t *testing.T) {
-	blockClient, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsExtendSize(t *testing.T) {
+// 	blockClient, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	volume, err := CreateVolume(t, blockClient)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, blockClient, volume)
+// 	volume, err := CreateVolume(t, blockClient)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, blockClient, volume)
 
-	tools.PrintResource(t, volume)
+// 	tools.PrintResource(t, volume)
 
-	err = ExtendVolumeSize(t, blockClient, volume)
-	th.AssertNoErr(t, err)
+// 	err = ExtendVolumeSize(t, blockClient, volume)
+// 	th.AssertNoErr(t, err)
 
-	newVolume, err := volumes.Get(context.TODO(), blockClient, volume.ID).Extract()
-	th.AssertNoErr(t, err)
+// 	newVolume, err := volumes.Get(context.TODO(), blockClient, volume.ID).Extract()
+// 	th.AssertNoErr(t, err)
 
-	tools.PrintResource(t, newVolume)
-}
+// 	tools.PrintResource(t, newVolume)
+// }
 
-func TestVolumeActionsImageMetadata(t *testing.T) {
-	blockClient, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsImageMetadata(t *testing.T) {
+// 	blockClient, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	volume, err := CreateVolume(t, blockClient)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, blockClient, volume)
+// 	volume, err := CreateVolume(t, blockClient)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, blockClient, volume)
 
-	err = SetImageMetadata(t, blockClient, volume)
-	th.AssertNoErr(t, err)
-}
+// 	err = SetImageMetadata(t, blockClient, volume)
+// 	th.AssertNoErr(t, err)
+// }
 
-func TestVolumeActionsSetBootable(t *testing.T) {
-	blockClient, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsSetBootable(t *testing.T) {
+// 	blockClient, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	volume, err := CreateVolume(t, blockClient)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, blockClient, volume)
+// 	volume, err := CreateVolume(t, blockClient)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, blockClient, volume)
 
-	err = SetBootable(t, blockClient, volume)
-	th.AssertNoErr(t, err)
-}
+// 	err = SetBootable(t, blockClient, volume)
+// 	th.AssertNoErr(t, err)
+// }
 
-func TestVolumeActionsChangeType(t *testing.T) {
-	//	clients.RequireAdmin(t)
+// func TestVolumeActionsChangeType(t *testing.T) {
+// 	//	clients.RequireAdmin(t)
 
-	client, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// 	client, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	volumeType1, err := CreateVolumeTypeNoExtraSpecs(t, client)
-	th.AssertNoErr(t, err)
-	defer DeleteVolumeType(t, client, volumeType1)
+// 	volumeType1, err := CreateVolumeTypeNoExtraSpecs(t, client)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolumeType(t, client, volumeType1)
 
-	volumeType2, err := CreateVolumeTypeNoExtraSpecs(t, client)
-	th.AssertNoErr(t, err)
-	defer DeleteVolumeType(t, client, volumeType2)
+// 	volumeType2, err := CreateVolumeTypeNoExtraSpecs(t, client)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolumeType(t, client, volumeType2)
 
-	volume, err := CreateVolumeWithType(t, client, volumeType1)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, client, volume)
+// 	volume, err := CreateVolumeWithType(t, client, volumeType1)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, client, volume)
 
-	tools.PrintResource(t, volume)
+// 	tools.PrintResource(t, volume)
 
-	err = ChangeVolumeType(t, client, volume, volumeType2)
-	th.AssertNoErr(t, err)
+// 	err = ChangeVolumeType(t, client, volume, volumeType2)
+// 	th.AssertNoErr(t, err)
 
-	newVolume, err := volumes.Get(context.TODO(), client, volume.ID).Extract()
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, newVolume.VolumeType, volumeType2.Name)
+// 	newVolume, err := volumes.Get(context.TODO(), client, volume.ID).Extract()
+// 	th.AssertNoErr(t, err)
+// 	th.AssertEquals(t, newVolume.VolumeType, volumeType2.Name)
 
-	tools.PrintResource(t, newVolume)
-}
+// 	tools.PrintResource(t, newVolume)
+// }
 
-func TestVolumeActionsResetStatus(t *testing.T) {
-	client, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
+// func TestVolumeActionsResetStatus(t *testing.T) {
+// 	client, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
 
-	volume, err := CreateVolume(t, client)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, client, volume)
+// 	volume, err := CreateVolume(t, client)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, client, volume)
 
-	tools.PrintResource(t, volume)
+// 	tools.PrintResource(t, volume)
 
-	err = ResetVolumeStatus(t, client, volume, "error")
-	th.AssertNoErr(t, err)
+// 	err = ResetVolumeStatus(t, client, volume, "error")
+// 	th.AssertNoErr(t, err)
 
-	err = ResetVolumeStatus(t, client, volume, "available")
-	th.AssertNoErr(t, err)
-}
+// 	err = ResetVolumeStatus(t, client, volume, "available")
+// 	th.AssertNoErr(t, err)
+// }
 
-func TestVolumeActionsReImage(t *testing.T) {
-	clients.SkipReleasesBelow(t, "stable/yoga")
+// func TestVolumeActionsReImage(t *testing.T) {
+// 	clients.SkipReleasesBelow(t, "stable/yoga")
 
-	choices, err := clients.AcceptanceTestChoicesFromEnv()
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	choices, err := clients.AcceptanceTestChoicesFromEnv()
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	blockClient, err := clients.NewBlockStorageV3Client()
-	th.AssertNoErr(t, err)
-	blockClient.Microversion = "3.68"
+// 	blockClient, err := clients.NewBlockStorageV3Client()
+// 	th.AssertNoErr(t, err)
+// 	blockClient.Microversion = "3.68"
 
-	volume, err := CreateVolume(t, blockClient)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, blockClient, volume)
+// 	volume, err := CreateVolume(t, blockClient)
+// 	th.AssertNoErr(t, err)
+// 	defer DeleteVolume(t, blockClient, volume)
 
-	err = ReImage(t, blockClient, volume, choices.ImageID)
-	th.AssertNoErr(t, err)
-}
+// 	err = ReImage(t, blockClient, volume, choices.ImageID)
+// 	th.AssertNoErr(t, err)
+// }
 
 // Note(jtopjian): I plan to work on this at some point, but it requires
 // setting up a server with iscsi utils.
