@@ -37,10 +37,17 @@ func (r *Attachment) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// Volume contains all the information associated with an OpenStack Volume.
-type Volume struct {
+// VolumeBrief contains only essential information associated with an OpenStack Volume.
+type VolumeBrief struct {
 	// Unique identifier for the volume.
 	ID string `json:"id"`
+	// Human-readable display name for the volume.
+	Name string `json:"name"`
+}
+
+// Volume contains all the information associated with an OpenStack Volume.
+type Volume struct {
+	VolumeBrief
 	// Current status of the volume.
 	Status string `json:"status"`
 	// Size of the volume in GB.
@@ -48,13 +55,11 @@ type Volume struct {
 	// AvailabilityZone is which availability zone the volume is in.
 	AvailabilityZone string `json:"availability_zone"`
 	// The date when this volume was created.
-	CreatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
 	// The date when this volume was last updated
-	UpdatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"updated_at"`
 	// Instances onto which the volume is attached.
 	Attachments []Attachment `json:"attachments"`
-	// Human-readable display name for the volume.
-	Name string `json:"name"`
 	// Human-readable description for the volume.
 	Description string `json:"description"`
 	// The type of volume to create, either SATA or SSD.
@@ -86,14 +91,6 @@ type Volume struct {
 	Host string `json:"os-vol-host-attr:host"`
 	// TenantID is the id of the project that owns the volume.
 	TenantID string `json:"os-vol-tenant-attr:tenant_id"`
-}
-
-// VolumeBrief contains only essential information associated with an OpenStack Volume.
-type VolumeBrief struct {
-	// Unique identifier for the volume.
-	ID string `json:"id"`
-	// Human-readable display name for the volume.
-	Name string `json:"name"`
 }
 
 // UnmarshalJSON another unmarshalling function

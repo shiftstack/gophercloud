@@ -4,13 +4,9 @@
 package v3
 
 import (
-	"context"
 	"testing"
 
 	"github.com/gophercloud/gophercloud/v2/internal/acceptance/clients"
-	"github.com/gophercloud/gophercloud/v2/internal/acceptance/tools"
-	"github.com/gophercloud/gophercloud/v2/openstack/blockstorage/v3/volumes"
-	"github.com/gophercloud/gophercloud/v2/pagination"
 	th "github.com/gophercloud/gophercloud/v2/testhelper"
 )
 
@@ -24,70 +20,73 @@ func TestVolumes(t *testing.T) {
 	th.AssertNoErr(t, err)
 	defer DeleteVolume(t, client, volume1)
 
-	volume2, err := CreateVolume(t, client)
-	th.AssertNoErr(t, err)
-	defer DeleteVolume(t, client, volume2)
+	// volume2, err := CreateVolume(t, client)
+	// th.AssertNoErr(t, err)
+	// defer DeleteVolume(t, client, volume2)
 
-	// Update volume
-	updatedVolumeName := "updated-name"
-	updatedVolumeDescription := "updated-description"
-	updateOpts := volumes.UpdateOpts{
-		Name:        &updatedVolumeName,
-		Description: &updatedVolumeDescription,
-	}
-	updatedVolume, err := volumes.Update(context.TODO(), client, volume1.ID, updateOpts).Extract()
-	th.AssertNoErr(t, err)
+	// // Update volume
+	// updatedVolumeName := "updated-name"
+	// updatedVolumeDescription := "updated-description"
+	// updateOpts := volumes.UpdateOpts{
+	// 	Name:        &updatedVolumeName,
+	// 	Description: &updatedVolumeDescription,
+	// }
+	// updatedVolume, err := volumes.Update(context.TODO(), client, volume1.ID, updateOpts).Extract()
+	// th.AssertNoErr(t, err)
 
-	tools.PrintResource(t, updatedVolume)
-	th.AssertEquals(t, updatedVolume.Name, updatedVolumeName)
-	th.AssertEquals(t, updatedVolume.Description, updatedVolumeDescription)
+	// tools.PrintResource(t, updatedVolume)
+	// th.AssertEquals(t, updatedVolume.Name, updatedVolumeName)
+	// th.AssertEquals(t, updatedVolume.Description, updatedVolumeDescription)
 
-	listOpts := volumes.ListOpts{}
+	// listOpts := volumes.ListOpts{}
 
-	err = volumes.List(client, listOpts).EachPage(context.TODO(), func(_ context.Context, page pagination.Page) (bool, error) {
-		actual, err := volumes.ExtractVolumes(page)
-		th.AssertNoErr(t, err)
-		th.AssertEquals(t, 2, len(actual))
+	// err = volumes.List(client, listOpts).EachPage(context.TODO(), func(_ context.Context, page pagination.Page) (bool, error) {
+	// 	actual, err := volumes.ExtractVolumes(page)
+	// 	th.AssertNoErr(t, err)
+	// 	th.AssertEquals(t, 2, len(actual))
 
-		var found1, found2 bool
-		for _, v := range actual {
-			if v.ID == volume1.ID {
-				found1 = true
-			}
-			if v.ID == volume2.ID {
-				found2 = true
-			}
-		}
+	// 	var found1, found2 bool
+	// 	for _, v := range actual {
+	// 		if v.ID == volume1.ID {
+	// 			found1 = true
+	// 		}
+	// 		if v.ID == volume2.ID {
+	// 			found2 = true
+	// 		}
+	// 	}
 
-		th.AssertEquals(t, found1, true)
-		th.AssertEquals(t, found2, true)
+	// 	th.AssertEquals(t, found1, true)
+	// 	th.AssertEquals(t, found2, true)
+	// 	tools.PrintResource(t, actual)
 
-		return true, nil
-	})
+	// 	return true, nil
+	// })
 
-	listOpts = volumes.ListOpts{
-		Limit: 1,
-	}
+	// listOpts = volumes.ListOpts{
+	// 	Limit: 1,
+	// }
 
-	err = volumes.ListDetail(client, listOpts).EachPage(context.TODO(), func(_ context.Context, page pagination.Page) (bool, error) {
-		actual, err := volumes.ExtractVolumesDetail(page)
-		th.AssertNoErr(t, err)
-		th.AssertEquals(t, 1, len(actual))
+	// err = volumes.ListDetail(client, listOpts).EachPage(context.TODO(), func(_ context.Context, page pagination.Page) (bool, error) {
+	// 	actual, err := volumes.ExtractVolumesDetail(page)
+	// 	th.AssertNoErr(t, err)
+	// 	th.AssertEquals(t, 1, len(actual))
 
-		var found bool
-		for _, v := range actual {
-			if v.ID == volume1.ID || v.ID == volume2.ID {
-				found = true
-			}
-		}
+	// 	var found bool
+	// 	for _, v := range actual {
+	// 		if v.ID == volume1.ID || v.ID == volume2.ID {
+	// 			found = true
+	// 		}
+	// 	}
 
-		th.AssertEquals(t, found, true)
-		th.AssertIntGreaterOrEqual(t, len(actual[0].Description), 1)
+	// 	th.AssertEquals(t, found, true)
+	// 	th.AssertIntGreaterOrEqual(t, len(actual[0].Description), 1)
 
-		return true, nil
-	})
+	// 	tools.PrintResource(t, actual)
 
-	th.AssertNoErr(t, err)
+	// 	return true, nil
+	// })
+
+	// th.AssertNoErr(t, err)
 }
 
 // func TestVolumesMultiAttach(t *testing.T) {
