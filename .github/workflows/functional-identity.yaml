@@ -2,6 +2,11 @@ name: functional-identity
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**identity**'
   schedule:
     - cron: '0 0 */3 * *'

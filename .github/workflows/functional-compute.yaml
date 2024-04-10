@@ -2,6 +2,11 @@ name: functional-compute
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**compute**'
   schedule:
     - cron: '0 0 */3 * *'

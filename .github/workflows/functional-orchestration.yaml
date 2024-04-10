@@ -2,6 +2,11 @@ name: functional-orchestration
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**orchestration**'
   schedule:
     - cron: '0 0 */3 * *'

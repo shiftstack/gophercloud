@@ -2,6 +2,11 @@ name: functional-sharedfilesystems
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**sharedfilesystems**'
   schedule:
     - cron: '0 0 */3 * *'

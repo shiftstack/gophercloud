@@ -2,6 +2,11 @@ name: functional-keymanager
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**keymanager**'
   schedule:
     - cron: '0 0 */3 * *'

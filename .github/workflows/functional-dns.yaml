@@ -2,6 +2,11 @@ name: functional-dns
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**openstack/dns**'
       - '**functional-dns.yaml'
   schedule:

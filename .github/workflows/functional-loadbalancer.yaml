@@ -2,6 +2,11 @@ name: functional-loadbalancer
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**loadbalancer**'
   schedule:
     - cron: '0 0 */3 * *'

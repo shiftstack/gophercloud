@@ -2,6 +2,11 @@ name: functional-image
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**image**'
   schedule:
     - cron: '0 0 */3 * *'

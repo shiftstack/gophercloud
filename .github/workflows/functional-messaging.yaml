@@ -2,6 +2,11 @@ name: functional-messaging
 on:
   pull_request:
     paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'pagination/**'
+      - 'openstack/*'
       - '**messaging**'
   schedule:
     - cron: '0 0 */3 * *'
