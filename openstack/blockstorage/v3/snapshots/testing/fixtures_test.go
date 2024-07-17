@@ -10,8 +10,8 @@ import (
 )
 
 // MockListResponse provides mock response for list snapshot API call
-func MockListResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots", func(w http.ResponseWriter, r *http.Request) {
+func MockListResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 
@@ -52,7 +52,7 @@ func MockListResponse(t *testing.T) {
             "rel": "next"
         }]
     }
-    `, th.Server.URL)
+    `, fakeServer.Server.URL)
 		case "1":
 			fmt.Fprintf(w, `{"snapshots": []}`)
 		default:
@@ -62,8 +62,8 @@ func MockListResponse(t *testing.T) {
 }
 
 // MockGetResponse provides mock response for get snapshot API call
-func MockGetResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22", func(w http.ResponseWriter, r *http.Request) {
+func MockGetResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 
@@ -86,8 +86,8 @@ func MockGetResponse(t *testing.T) {
 }
 
 // MockCreateResponse provides mock response for create snapshot API call
-func MockCreateResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots", func(w http.ResponseWriter, r *http.Request) {
+func MockCreateResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 		th.TestHeader(t, r, "Content-Type", "application/json")
@@ -122,8 +122,8 @@ func MockCreateResponse(t *testing.T) {
 }
 
 // MockUpdateMetadataResponse provides mock response for update metadata snapshot API call
-func MockUpdateMetadataResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/123/metadata", func(w http.ResponseWriter, r *http.Request) {
+func MockUpdateMetadataResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/123/metadata", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "PUT")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 		th.TestHeader(t, r, "Content-Type", "application/json")
@@ -146,8 +146,8 @@ func MockUpdateMetadataResponse(t *testing.T) {
 }
 
 // MockDeleteResponse provides mock response for delete snapshot API call
-func MockDeleteResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22", func(w http.ResponseWriter, r *http.Request) {
+func MockDeleteResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 		w.WriteHeader(http.StatusNoContent)
@@ -155,8 +155,8 @@ func MockDeleteResponse(t *testing.T) {
 }
 
 // MockUpdateResponse provides mock response for update snapshot API call
-func MockUpdateResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22", func(w http.ResponseWriter, r *http.Request) {
+func MockUpdateResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "PUT")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 
@@ -180,8 +180,8 @@ func MockUpdateResponse(t *testing.T) {
 }
 
 // MockResetStatusResponse provides mock response for reset snapshot status API call
-func MockResetStatusResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22/action", func(w http.ResponseWriter, r *http.Request) {
+func MockResetStatusResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22/action", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 		th.TestHeader(t, r, "Content-Type", "application/json")
@@ -197,8 +197,8 @@ func MockResetStatusResponse(t *testing.T) {
 }
 
 // MockUpdateStatusResponse provides mock response for update snapshot status API call
-func MockUpdateStatusResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22/action", func(w http.ResponseWriter, r *http.Request) {
+func MockUpdateStatusResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22/action", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 		th.TestHeader(t, r, "Content-Type", "application/json")
@@ -215,8 +215,8 @@ func MockUpdateStatusResponse(t *testing.T) {
 }
 
 // MockForceDeleteResponse provides mock response for force delete snapshot API call
-func MockForceDeleteResponse(t *testing.T) {
-	th.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22/action", func(w http.ResponseWriter, r *http.Request) {
+func MockForceDeleteResponse(t *testing.T, fakeServer th.FakeServer) {
+	fakeServer.Mux.HandleFunc("/snapshots/d32019d3-bc6e-4319-9c1d-6722fc136a22/action", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 		th.TestHeader(t, r, "Content-Type", "application/json")
