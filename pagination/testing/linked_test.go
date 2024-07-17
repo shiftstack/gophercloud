@@ -9,6 +9,7 @@ import (
 
 	"github.com/gophercloud/gophercloud/v2/pagination"
 	th "github.com/gophercloud/gophercloud/v2/testhelper"
+	"github.com/gophercloud/gophercloud/v2/testhelper/client"
 )
 
 // LinkedPager sample and test cases.
@@ -48,7 +49,7 @@ func createLinked() pagination.Pager {
 		fmt.Fprintf(w, `{ "ints": [7, 8, 9], "links": { "next": null } }`)
 	})
 
-	client := createClient()
+	client := client.ServiceClient()
 
 	createPage := func(r pagination.PageResult) pagination.Page {
 		return LinkedPageResult{pagination.LinkedPageBase{PageResult: r}}
