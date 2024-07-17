@@ -77,6 +77,9 @@ func TestCreateHealthmonitor(t *testing.T) {
 }
 
 func TestRequiredCreateOpts(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
 	res := monitors.Create(context.TODO(), fake.ServiceClient(), monitors.CreateOpts{})
 	if res.Err == nil {
 		t.Fatalf("Expected error, got none")
@@ -134,6 +137,9 @@ func TestUpdateHealthmonitor(t *testing.T) {
 }
 
 func TestDelayMustBeGreaterOrEqualThanTimeout(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
 	_, err := monitors.Create(context.TODO(), fake.ServiceClient(), monitors.CreateOpts{
 		Type:          "HTTP",
 		PoolID:        "d459f7d8-c6ee-439d-8713-d3fc08aeed8d",

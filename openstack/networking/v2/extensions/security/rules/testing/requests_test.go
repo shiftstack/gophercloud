@@ -165,6 +165,9 @@ func TestCreate(t *testing.T) {
 }
 
 func TestRequiredCreateOpts(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
 	res := rules.Create(context.TODO(), fake.ServiceClient(), rules.CreateOpts{Direction: rules.DirIngress})
 	if res.Err == nil {
 		t.Fatalf("Expected error, got none")
